@@ -1,9 +1,9 @@
 package com.seanshubin.concurrency.samples.domain
 
-import scala.concurrent.{Await, Awaitable}
 import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Awaitable}
 
-class Runner(worker:Worker, done:Awaitable[Unit], cleanup:Cleanup) extends Runnable{
+class Runner(worker: Worker, done: Awaitable[Unit], cleanup: Cleanup) extends Runnable {
   override def run() = {
     val quantity = 20
     worker.setWorkQuantity(quantity)
