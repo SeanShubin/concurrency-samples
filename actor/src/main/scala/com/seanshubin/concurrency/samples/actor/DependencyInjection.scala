@@ -14,7 +14,8 @@ trait DependencyInjection {
   val done: Promise[Unit] = Promise()
   val stateful: Behavior[Event] = new StatefulBehavior(logger.stateChanged, done)
   val eventActorSystem: ActorSystem[Event] = ActorSystem("state", stateful)
+  val eventActorSystemContract: ActorSystemContract[Event] = new ActorSystemDelegate[Event](eventActorSystem)
   val worker: Worker = new PrimeNumberWorker(futureRunner, eventActorSystem.!)
-  val cleanup: Cleanup = new CleanupActorSystems(eventActorSystem)
+  val cleanup: Cleanup = new CleanupActorSystems(eventActorSystemContract)
   val runner: Runnable = new Runner(worker, done.future, cleanup)
 }
