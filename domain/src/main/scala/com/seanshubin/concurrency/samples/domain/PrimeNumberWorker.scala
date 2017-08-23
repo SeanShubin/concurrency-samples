@@ -7,7 +7,7 @@ import scala.concurrent.Future
 class PrimeNumberWorker(futureRunner: FutureRunner, sendEvent: Event => Unit) extends Worker {
   override def doWork(input: Int): Future[BigInt] = {
     futureRunner.runInFuture {
-      val name = s"work $input"
+      val name = s"work-$input"
       sendEvent(Started(name, input))
       val output = Prime.nthPrime(input)
       sendEvent(Finished(name, input, output))

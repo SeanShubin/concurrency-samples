@@ -21,6 +21,8 @@ case class State(inProgress: Set[String], started: Int, completed: Int, expected
       case None => false
     }
   }
+
+  def prettyString: String = f"started = $started%02d, completed = $completed%02d, inProgress(${inProgress.size}%02d): ${inProgress.mkString(", ")}%s"
 }
 
 object State {
