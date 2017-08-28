@@ -1,0 +1,15 @@
+{
+  reportDir atomic-reference/target/detangler/
+  searchPaths [
+    atomic-reference/target/concurrency-samples-atomic-reference.jar
+  ]
+  level 1
+  startsWith {
+    include [[com seanshubin concurrency samples]]
+    drop [[com seanshubin concurrency samples]]
+    exclude []
+  }
+  allowedInCycle [
+  ]
+  canFailBuild true
+}

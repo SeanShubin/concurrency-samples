@@ -36,7 +36,8 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.seanshubin.concurrency.samples.console.ConsoleApplication</mainClass>
+                            <mainClass>com.seanshubin.concurrency.samples.atomicreference.AtomicReferenceSampleApp
+                            </mainClass>
                         </manifest>
                     </archive>
                 </configuration>

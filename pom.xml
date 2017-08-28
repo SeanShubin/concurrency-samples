@@ -41,6 +41,7 @@
         <module>not-thread-safe</module>
         <module>atomic-reference</module>
         <module>actor</module>
+        <module>locking</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
