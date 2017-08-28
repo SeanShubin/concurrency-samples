@@ -1,7 +1,7 @@
 {
-  reportDir atomic-reference/target/detangler/
+  reportDir locking/target/detangler/
   searchPaths [
-    atomic-reference/target/concurrency-samples-atomic-reference.jar
+    locking/target/concurrency-samples-locking.jar
   ]
   level 1
   startsWith {
