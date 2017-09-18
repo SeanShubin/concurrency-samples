@@ -1,0 +1,109 @@
+package com.seanshubin.concurrency.samples.actor.builtin
+
+class StatefulBehaviorTest extends FunSuite {
+  test("work started") {
+    // given
+    val done = Promise[Unit]()
+    val stateChanged = new StateChangedStub
+    val statefulBehavior = new StatefulBehavior(stateChanged, done)
+    val dummyContext: ActorContext[Event] = null
+    val input = 123
+    val event = Started("id", input)
+    val inProgress = Set[String]("id")
+    val started = 1
+    val completed = 0
+    val expectedQuantity = None
+    val expected = State(inProgress, started, completed, expectedQuantity)
+
+    // when
+    statefulBehavior.receiveMessage(dummyContext, event)
+
+    // then
+    assert(stateChanged.invocations.size === 1)
+    assert(stateChanged.invocations(0) === expected)
+    assert(done.isCompleted === false)
+  }
+
+  test("work finished") {
+    // given
+    val done = Promise[Unit]()
+    val stateChanged = new StateChangedStub
+    val statefulBehavior = new StatefulBehavior(stateChanged, done)
+    val dummyContext: ActorContext[Event] = null
+    val input = 123
+    val output = 456
+    val startedEvent = Started("id", input)
+    val finishedEvent = Finished("id", input, output)
+    val inProgress = Set[String]()
+    val started = 1
+    val completed = 1
+    val expectedQuantity = None
+    val expected = State(inProgress, started, completed, expectedQuantity)
+    statefulBehavior.receiveMessage(dummyContext, startedEvent)
+
+    // when
+    statefulBehavior.receiveMessage(dummyContext, finishedEvent)
+
+    // then
+    assert(stateChanged.invocations.size === 2)
+    assert(stateChanged.invocations(1) === expected)
+    assert(done.isCompleted === false)
+  }
+
+  test("expect quantity") {
+    // given
+    val done = Promise[Unit]()
+    val stateChanged = new StateChangedStub
+    val statefulBehavior = new StatefulBehavior(stateChanged, done)
+    val dummyContext: ActorContext[Event] = null
+    val quantity = 123
+    val event = ExpectQuantity(quantity)
+    val inProgress = Set[String]()
+    val started = 0
+    val completed = 0
+    val expectedQuantity = Some(quantity)
+    val expected = State(inProgress, started, completed, expectedQuantity)
+
+    // when
+    statefulBehavior.receiveMessage(dummyContext, event)
+
+    // then
+    assert(stateChanged.invocations.size === 1)
+    assert(stateChanged.invocations(0) === expected)
+    assert(done.isCompleted === false)
+  }
+
+  test("done") {
+    // given
+    val done = Promise[Unit]()
+    val stateChanged = new StateChangedStub
+    val statefulBehavior = new StatefulBehavior(stateChanged, done)
+    val dummyContext: ActorContext[Event] = null
+    val input = 123
+    val output = 456
+    val quantity = 1
+    val expectQuantityEvent = ExpectQuantity(quantity)
+    val startedEvent = Started("id", input)
+    val finishedEvent = Finished("id", input, output)
+    val inProgress = Set[String]()
+    val started = 1
+    val completed = 1
+    val expectedQuantity = None
+    val expected = State(inProgress, started, completed, expectedQuantity)
+
+    // when
+    statefulBehavior.receiveMessage(dummyContext, expectQuantityEvent)
+    statefulBehavior.receiveMessage(dummyContext, startedEvent)
+    statefulBehavior.receiveMessage(dummyContext, finishedEvent)
+
+    // then
+    assert(done.isCompleted === true)
+  }
+
+  class StateChangedStub extends (State => Unit) {
+    val invocations: ArrayBuffer[State] = ArrayBuffer()
+
+    override def apply(state: State): Unit = invocations.append(state)
+  }
+
+}

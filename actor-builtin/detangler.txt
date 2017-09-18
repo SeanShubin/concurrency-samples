@@ -1,0 +1,15 @@
+{
+  reportDir actor/target/detangler/
+  searchPaths [
+    actor/target/concurrency-samples-actor.jar
+  ]
+  level 1
+  startsWith {
+    include [[com seanshubin concurrency samples]]
+    drop [[com seanshubin concurrency samples]]
+    exclude []
+  }
+  allowedInCycle [
+  ]
+  canFailBuild true
+}
