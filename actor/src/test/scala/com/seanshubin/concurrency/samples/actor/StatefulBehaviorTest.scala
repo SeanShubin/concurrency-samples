@@ -24,7 +24,7 @@ class StatefulBehaviorTest extends FunSuite {
     val expected = State(inProgress, started, completed, expectedQuantity)
 
     // when
-    statefulBehavior.message(dummyContext, event)
+    statefulBehavior.receiveMessage(dummyContext, event)
 
     // then
     assert(stateChanged.invocations.size === 1)
@@ -47,10 +47,10 @@ class StatefulBehaviorTest extends FunSuite {
     val completed = 1
     val expectedQuantity = None
     val expected = State(inProgress, started, completed, expectedQuantity)
-    statefulBehavior.message(dummyContext, startedEvent)
+    statefulBehavior.receiveMessage(dummyContext, startedEvent)
 
     // when
-    statefulBehavior.message(dummyContext, finishedEvent)
+    statefulBehavior.receiveMessage(dummyContext, finishedEvent)
 
     // then
     assert(stateChanged.invocations.size === 2)
@@ -73,7 +73,7 @@ class StatefulBehaviorTest extends FunSuite {
     val expected = State(inProgress, started, completed, expectedQuantity)
 
     // when
-    statefulBehavior.message(dummyContext, event)
+    statefulBehavior.receiveMessage(dummyContext, event)
 
     // then
     assert(stateChanged.invocations.size === 1)
@@ -100,16 +100,16 @@ class StatefulBehaviorTest extends FunSuite {
     val expected = State(inProgress, started, completed, expectedQuantity)
 
     // when
-    statefulBehavior.message(dummyContext, expectQuantityEvent)
-    statefulBehavior.message(dummyContext, startedEvent)
-    statefulBehavior.message(dummyContext, finishedEvent)
+    statefulBehavior.receiveMessage(dummyContext, expectQuantityEvent)
+    statefulBehavior.receiveMessage(dummyContext, startedEvent)
+    statefulBehavior.receiveMessage(dummyContext, finishedEvent)
 
     // then
     assert(done.isCompleted === true)
   }
 
   class StateChangedStub extends (State => Unit) {
-    val invocations = ArrayBuffer[State]()
+    val invocations: ArrayBuffer[State] = ArrayBuffer()
 
     override def apply(state: State): Unit = invocations.append(state)
   }

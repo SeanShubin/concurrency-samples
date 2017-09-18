@@ -5,7 +5,7 @@ import java.util.concurrent.ThreadFactory
 import akka.actor.{DynamicAccess, Scheduler}
 import akka.event.{LoggingAdapter, LoggingFilter}
 import akka.typed.patterns.Receptionist
-import akka.typed.{ActorRef, Behavior, DeploymentConfig, Dispatchers, EventStream, Settings, Terminated}
+import akka.typed.{ActorRef, Behavior, Dispatchers, EventStream, Props, Settings, Terminated}
 import akka.util.Timeout
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
@@ -45,7 +45,7 @@ trait ActorSystemContract[T] {
 
   def printTree: String
 
-  def systemActorOf[U](behavior: Behavior[U], name: String, deployment: DeploymentConfig)(implicit timeout: Timeout): Future[ActorRef[U]]
+  def systemActorOf[U](behavior: Behavior[U], name: String, props: Props)(implicit timeout: Timeout): Future[ActorRef[U]]
 
   def receptionist: ActorRef[Receptionist.Command]
 
