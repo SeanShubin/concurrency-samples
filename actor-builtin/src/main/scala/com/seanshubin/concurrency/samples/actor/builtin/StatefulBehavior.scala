@@ -1,5 +1,11 @@
 package com.seanshubin.concurrency.samples.actor.builtin
 
+import akka.typed.{ActorContext, Behavior, ExtensibleBehavior, Signal}
+import com.seanshubin.concurrency.samples.domain.Event.{ExpectQuantity, Finished, Started}
+import com.seanshubin.concurrency.samples.domain.{Event, State}
+
+import scala.concurrent.Promise
+
 class StatefulBehavior(stateChanged: State => Unit, done: Promise[Unit]) extends ExtensibleBehavior[Event] {
   private var state = State.Empty
 

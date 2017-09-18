@@ -1,5 +1,11 @@
 package com.seanshubin.concurrency.samples.actor.builtin
 
+import akka.typed.Terminated
+import com.seanshubin.concurrency.samples.domain.Event
+import org.scalatest.FunSuite
+
+import scala.concurrent.Future
+
 class CleanupActorSystemsTest extends FunSuite {
   test("cleanup") {
     // given

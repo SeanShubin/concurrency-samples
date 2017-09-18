@@ -1,7 +1,17 @@
 package com.seanshubin.concurrency.samples.actor.builtin
+import akka.typed.ActorContext
+import com.seanshubin.concurrency.samples.domain.Event.{ExpectQuantity, Finished, Started}
+import com.seanshubin.concurrency.samples.domain.{Event, State}
+import org.scalatest.FunSuite
+
+import scala.collection.mutable.ArrayBuffer
+import scala.concurrent.Promise
 
 class StatefulBehaviorTest extends FunSuite {
   test("work started") {
+//    val a:EffectfulActorContext = null
+//    val b:Inbox = null
+
     // given
     val done = Promise[Unit]()
     val stateChanged = new StateChangedStub
