@@ -93,11 +93,6 @@ class StatefulBehaviorTest extends FunSuite {
     val expectQuantityEvent = ExpectQuantity(quantity)
     val startedEvent = Started("id", input)
     val finishedEvent = Finished("id", input, output)
-    val inProgress = Set[String]()
-    val started = 1
-    val completed = 1
-    val expectedQuantity = None
-    val expected = State(inProgress, started, completed, expectedQuantity)
 
     // when
     statefulBehavior.receiveMessage(dummyContext, expectQuantityEvent)
