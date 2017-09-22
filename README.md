@@ -1,6 +1,7 @@
 # Concurrency Samples
 - the work
     - [Runner](domain/src/main/scala/com/seanshubin/concurrency/samples/domain/Runner.scala)
+    - [PrimeNumberWorker](domain/src/main/scala/com/seanshubin/concurrency/samples/domain/PrimeNumberWorker.scala)
     - [Prime](domain/src/main/scala/com/seanshubin/concurrency/samples/domain/Prime.scala)
     - [State](domain/src/main/scala/com/seanshubin/concurrency/samples/domain/State.scala)
 - the concurrency models
