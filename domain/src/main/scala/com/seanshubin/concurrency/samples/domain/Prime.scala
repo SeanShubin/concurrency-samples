@@ -1,5 +1,7 @@
 package com.seanshubin.concurrency.samples.domain
 
+import scala.annotation.tailrec
+
 object Prime {
   def nthPrime(index: BigInt): BigInt = {
     if (index == 0) 1
@@ -7,6 +9,7 @@ object Prime {
     else nextPrime(Seq(2), 3, index - 2)
   }
 
+  @tailrec
   private def nextPrime(soFarSeq: Seq[BigInt], candidate: BigInt, iterations: BigInt): BigInt = {
     def isDivisible(soFar: BigInt): Boolean = candidate.mod(soFar) == 0
 
