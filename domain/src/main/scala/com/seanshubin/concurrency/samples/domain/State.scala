@@ -22,7 +22,7 @@ case class State(inProgress: Set[String], started: Int, completed: Int, expected
     }
   }
 
-  def prettyString: String = f"started = $started%02d, completed = $completed%02d, inProgress(${inProgress.size}%02d): ${inProgress.mkString(", ")}%s"
+  def prettyString: String = f"started = $started%2d, completed = $completed%2d, inProgress(${inProgress.size}%2d): ${inProgress.mkString(", ")}%s"
 }
 
 object State {

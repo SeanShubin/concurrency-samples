@@ -1,5 +1,7 @@
 package com.seanshubin.concurrency.samples.atomicreference
 
+import java.time.{Clock, Instant}
+
 import com.seanshubin.concurrency.samples.domain._
 
 import scala.concurrent.ExecutionContext.Implicits
@@ -9,7 +11,9 @@ trait DependencyInjection {
   val executionContext: ExecutionContext = Implicits.global
   val futureRunner: FutureRunner = new FutureRunnerWithExecutionContext(executionContext)
   val emit: String => Unit = println
-  val logger: Logger = new LineEmittingLogger(emit)
+  val clock: Clock = Clock.systemUTC()
+  val referenceTime: Instant = clock.instant()
+  val logger: Logger = new LineEmittingLogger(emit, clock, referenceTime)
   val done: Promise[Unit] = Promise()
   val stateful: Stateful = new StatefulWithAtomicReference(logger.stateChanged, done)
   val worker: Worker = new PrimeNumberWorker(futureRunner, stateful.message)
