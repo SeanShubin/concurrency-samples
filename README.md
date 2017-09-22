@@ -8,3 +8,18 @@
     - [locking](locking/src/main/scala/com/seanshubin/concurrency/samples/locking/StatefulWithLocking.scala)
     - [atomic reference](atomic-reference/src/main/scala/com/seanshubin/concurrency/samples/atomicreference/StatefulWithAtomicReference.scala)
     - [actor](actor/src/main/scala/com/seanshubin/concurrency/samples/actor/StatefulBehavior.scala)
+
+## Deadlock
+- Coffman conditions
+    - Mutual exclusion
+    - Resource holding
+    - No preemption
+    - Circular wait
+- Example
+    - Thread A and B need resources C and D
+    - A acquires lock on C
+    - B acquires lock on D
+    - A tries to acquire lock on D
+        - A blocks waiting for B to release lock on D
+    - B tries to acquire lock on C
+        - B blocks waiting for A to release lock on C
