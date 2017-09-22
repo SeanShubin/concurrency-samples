@@ -2,6 +2,7 @@
 - the work
     - [Runner](domain/src/main/scala/com/seanshubin/concurrency/samples/domain/Runner.scala)
     - [Prime](domain/src/main/scala/com/seanshubin/concurrency/samples/domain/Prime.scala)
+    - [State](domain/src/main/scala/com/seanshubin/concurrency/samples/domain/State.scala)
 - the concurrency models
     - [not thread safe](not-thread-safe/src/main/scala/com/seanshubin/concurrency/samples/notthreadsafe/StatefulNotThreadSafe.scala)
     - [locking](locking/src/main/scala/com/seanshubin/concurrency/samples/locking/StatefulWithLocking.scala)
