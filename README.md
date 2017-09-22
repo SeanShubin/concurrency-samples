@@ -12,10 +12,10 @@
 
 ## Deadlock
 - Coffman conditions
-    - Mutual exclusion
-    - Resource holding
-    - No preemption
-    - Circular wait
+    - Mutual Exclusion
+    - Hold and Wait
+    - No Resource Preemption
+    - Circular Wait
 - Example
     - Thread A and B need resources C and D
     - A acquires lock on C
