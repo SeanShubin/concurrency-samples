@@ -5,7 +5,7 @@ import com.seanshubin.concurrency.samples.domain.{Event, State, Stateful}
 
 import scala.concurrent.Promise
 
-class StatefulNotThreadSafe(monitor: State => Unit, done: Promise[Unit]) extends Stateful {
+class StatefulNotThreadSafe(notifyThatStateChanged: State => Unit, done: Promise[Unit]) extends Stateful {
   private var state = State.Empty
 
   override def message(msg: Event) = {
@@ -14,7 +14,7 @@ class StatefulNotThreadSafe(monitor: State => Unit, done: Promise[Unit]) extends
       case Finished(id, _, _) => state = state.finishWork(id)
       case ExpectQuantity(quantity) => state = state.expectQuantity(quantity)
     }
-    monitor(state)
+    notifyThatStateChanged(state)
     if (state.isDone) {
       done.success(())
     }

@@ -5,7 +5,7 @@ import com.seanshubin.concurrency.samples.domain.{Event, State, Stateful}
 
 import scala.concurrent.Promise
 
-class StatefulWithLocking(monitor: State => Unit, done: Promise[Unit]) extends Stateful {
+class StatefulWithLocking(notifyThatStateChanged: State => Unit, done: Promise[Unit]) extends Stateful {
   private var state = State.Empty
 
   override def message(msg: Event) = {
@@ -25,7 +25,7 @@ class StatefulWithLocking(monitor: State => Unit, done: Promise[Unit]) extends S
   private def atomicallyTransformState(transformState: => State): Unit = {
     synchronized {
       state = transformState
-      monitor(state)
+      notifyThatStateChanged(state)
       if (state.isDone) {
         done.success(())
       }

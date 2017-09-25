@@ -8,7 +8,7 @@ import com.seanshubin.concurrency.samples.domain.{Event, State, Stateful}
 import scala.annotation.tailrec
 import scala.concurrent.Promise
 
-class StatefulWithAtomicReference(monitor: State => Unit, done: Promise[Unit]) extends Stateful {
+class StatefulWithAtomicReference(notifyThatStateChanged: State => Unit, done: Promise[Unit]) extends Stateful {
   private val state = new AtomicReference[State](State.Empty)
 
   override def message(msg: Event) = {
@@ -30,7 +30,7 @@ class StatefulWithAtomicReference(monitor: State => Unit, done: Promise[Unit]) e
     val oldState = state.get()
     val newState = transformState
     if (state.compareAndSet(oldState, newState)) {
-      monitor(newState)
+      notifyThatStateChanged(newState)
       if (state.get.isDone) {
         done.success(())
       }
