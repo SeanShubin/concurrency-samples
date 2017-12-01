@@ -46,6 +46,7 @@
         <module>actor</module>
         <module>locking</module>
         <module>actor-builtin</module>
+        <module>state-machine</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
