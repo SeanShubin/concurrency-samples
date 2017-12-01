@@ -14,7 +14,6 @@ trait DependencyInjection {
   val donePromise: Promise[Unit] = Promise()
   val environment: Environment = new EnvironmentImpl(donePromise, clock)
   val emitLine: String => Unit = println
-  val notifications: Notifications = new LineEmittingNotifications(emitLine)
   val eventApplier: EventApplier = new EventApplierImpl
   val stateMachine: Behavior[Event] = new StateMachine(
     environment, eventApplier)

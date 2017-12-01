@@ -1,5 +1,7 @@
 package com.seanshubin.concurrency.samples.statemachine
 
+import java.time.{Duration, Instant}
+
 import akka.typed.Signal
 
 sealed trait Effect {
@@ -8,11 +10,22 @@ sealed trait Effect {
 
 object Effect {
 
-  case class NotifyStarted(expectedQuantity: Int) extends Effect {
+  case object GetStartedTime extends Effect {
     override def apply(environment: Environment, eventListener: Event => Unit): Unit = {
-      val startTime = environment.currentTime()
-      eventListener(Event.StartTime(startTime))
-      environment.emitLine(s"started with quantity $expectedQuantity")
+      val time = environment.currentTime()
+      eventListener(Event.GotStartTime(time))
+    }
+  }
+
+  case object GetFinishedTime extends Effect {
+    override def apply(environment: Environment, eventListener: Event => Unit): Unit = {
+      val time = environment.currentTime()
+      eventListener(Event.GotFinishTime(time))
+    }
+  }
+
+  case class CreateAddEvents(expectedQuantity: Int) extends Effect {
+    override def apply(environment: Environment, eventListener: Event => Unit): Unit = {
       for {
         index <- 1 to expectedQuantity
       } {
@@ -27,9 +40,9 @@ object Effect {
     }
   }
 
-  case object NotifyFinished extends Effect {
+  case object FinishedComputation extends Effect {
     override def apply(environment: Environment, eventListener: Event => Unit): Unit = {
-      environment.emitLine(s"finished")
+      environment.emitLine(s"finished computation")
     }
   }
 
@@ -45,9 +58,24 @@ object Effect {
     }
   }
 
-  case class ReceivedEvent(event: Event) extends Effect {
+  case class LogEvent(event: Event) extends Effect {
     override def apply(environment: Environment, eventListener: Event => Unit): Unit = {
       environment.emitLine(s"event = $event")
+    }
+  }
+
+  case class LogStateTransition(oldState: State, newState: State) extends Effect {
+    override def apply(environment: Environment, eventListener: Event => Unit): Unit = {
+      environment.emitLine(s"$oldState => $newState")
+    }
+  }
+
+  case class GenerateReport(result: Int, startTime: Instant, finishTime: Instant) extends Effect {
+    override def apply(environment: Environment, eventListener: Event => Unit): Unit = {
+      val duration = Duration.between(startTime, finishTime).toMillis
+      val durationString = DurationFormat.MillisecondsFormat.format(duration)
+      environment.emitLine(s"result = $result")
+      environment.emitLine(durationString)
     }
   }
 

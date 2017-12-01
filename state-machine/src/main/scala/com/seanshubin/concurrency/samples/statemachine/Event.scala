@@ -12,8 +12,8 @@ object Event {
 
   case class Finished(result: Int)
 
-  case class StartTime(value: Instant) extends Event
+  case class GotStartTime(value: Instant) extends Event
 
-  case class FinishTime(value: Instant) extends Event
+  case class GotFinishTime(value: Instant) extends Event
 
 }

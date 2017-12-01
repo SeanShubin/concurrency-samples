@@ -2,20 +2,39 @@ package com.seanshubin.concurrency.samples.statemachine
 
 import java.time.Instant
 
+/*
+state/event/effect
+
+initial
+    ready to get started
+        get start time
+        create add events
+        create start time event
+processing
+    number added
+        create finished computation event
+        get end time
+        create end time event
+    start time checked
+finished computation
+    end time checked
+        generate report
+*/
+
 sealed trait State {
-  def start(expectedQuantity: Int): StateAndEffects = {
+  def readyToGetStarted(expectedQuantity: Int): StateAndEffects = {
     unsupported(s"start($expectedQuantity)")
   }
 
-  def addNumber(value: Int): StateAndEffects = {
+  def numberAdded(value: Int): StateAndEffects = {
     unsupported(s"addNumber($value)")
   }
 
-  def startTime(value: Instant): StateAndEffects = {
+  def startTimeChecked(value: Instant): StateAndEffects = {
     unsupported(s"startTime($value)")
   }
 
-  def finishTime(value: Instant): StateAndEffects = {
+  def endTimeChecked(value: Instant): StateAndEffects = {
     unsupported(s"finishTime($value)")
   }
 
@@ -24,14 +43,7 @@ sealed trait State {
   }
 
   def name: String = {
-    val possiblyMessySimpleName = getClass.getSimpleName
-    val indexOfDollar = possiblyMessySimpleName.indexOf('$')
-    val simpleName = if (indexOfDollar == -1) {
-      possiblyMessySimpleName
-    } else {
-      possiblyMessySimpleName.substring(0, indexOfDollar)
-    }
-    simpleName
+    ClassUtil.getSimpleClassName(this)
   }
 }
 
@@ -39,35 +51,51 @@ sealed trait State {
 object State {
 
   case object Initial extends State {
-    override def start(expectedQuantity: Int): StateAndEffects = {
+    override def readyToGetStarted(expectedQuantity: Int): StateAndEffects = {
       val newState = Processing(
         sum = 0,
         expectToProcess = expectedQuantity,
         processed = 0,
         startTime = None)
-      val effects = Seq(Effect.NotifyStarted(expectedQuantity))
+      val effects = Seq(
+        Effect.GetStartedTime,
+        Effect.CreateAddEvents(expectedQuantity))
       StateAndEffects(newState, effects)
     }
   }
 
   case class Processing(sum: Int,
                         expectToProcess: Int,
-                        processed: Int, startTime: Option[Instant]) extends State {
-    override def addNumber(value: Int): StateAndEffects = {
+                        processed: Int,
+                        startTime: Option[Instant]) extends State {
+    override def numberAdded(value: Int): StateAndEffects = {
       val newProcessed = processed + 1
       val newValue = sum + value
-      val newState = copy(processed = newProcessed, sum = newValue)
-      val result = if (newProcessed == expectToProcess) {
-        StateAndEffects(newState, Seq(Effect.NotifyFinished, Effect.ResolveDonePromise))
+      val stateAndEffects = if (newProcessed == expectToProcess && startTime.isDefined) {
+        val newState = FinishedComputation(
+          finalResult = sum,
+          startTime = startTime.get)
+        val effects = Seq(Effect.NotifyAdded(value), Effect.FinishedComputation, Effect.GetFinishedTime)
+        StateAndEffects(newState, effects)
       } else {
-        StateAndEffects(newState, Seq(Effect.NotifyAdded(value)))
+        val newState = copy(processed = newProcessed, sum = newValue)
+        val effects = Seq(Effect.NotifyAdded(value))
+        StateAndEffects(newState, effects)
       }
-      result
+      stateAndEffects
     }
 
-    override def startTime(value: Instant): StateAndEffects = {
+    override def startTimeChecked(value: Instant): StateAndEffects = {
       StateAndEffects(copy(startTime = Some(value)), Seq())
     }
   }
+
+  case class FinishedComputation(finalResult: Int, startTime: Instant) extends State {
+    override def endTimeChecked(value: Instant): StateAndEffects = {
+      StateAndEffects(Done, Seq(Effect.GenerateReport(finalResult, startTime, value), Effect.ResolveDonePromise))
+    }
+  }
+
+  case object Done extends State
 
 }

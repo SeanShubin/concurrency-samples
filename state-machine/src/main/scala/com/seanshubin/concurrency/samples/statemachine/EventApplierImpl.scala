@@ -1,14 +1,14 @@
 package com.seanshubin.concurrency.samples.statemachine
 
-import com.seanshubin.concurrency.samples.statemachine.Event.{AddNumber, FinishTime, Start, StartTime}
+import com.seanshubin.concurrency.samples.statemachine.Event.{AddNumber, GotFinishTime, GotStartTime, Start}
 
 class EventApplierImpl extends EventApplier {
   def applyEvent(state: State, event: Event): StateAndEffects = {
     event match {
-      case Start(expectedQuantity) => state.start(expectedQuantity)
-      case AddNumber(value) => state.addNumber(value)
-      case StartTime(value) => state.startTime(value)
-      case FinishTime(value) => state.finishTime(value)
+      case Start(expectedQuantity) => state.readyToGetStarted(expectedQuantity)
+      case AddNumber(value) => state.numberAdded(value)
+      case GotStartTime(value) => state.startTimeChecked(value)
+      case GotFinishTime(value) => state.endTimeChecked(value)
     }
   }
 }
