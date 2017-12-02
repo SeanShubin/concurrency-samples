@@ -2,8 +2,6 @@ package com.seanshubin.concurrency.samples.statemachine
 
 import java.time.{Duration, Instant}
 
-import akka.typed.Signal
-
 sealed trait Effect {
   def apply(environment: Environment, eventListener: Event => Unit): Unit
 }
@@ -49,18 +47,6 @@ object Effect {
   case object ResolveDonePromise extends Effect {
     override def apply(environment: Environment, eventListener: Event => Unit): Unit = {
       environment.setDone()
-    }
-  }
-
-  case class ReceivedSignal(signal: Signal) extends Effect {
-    override def apply(environment: Environment, eventListener: Event => Unit): Unit = {
-      environment.emitLine(s"signal = $signal")
-    }
-  }
-
-  case class LogEvent(event: Event) extends Effect {
-    override def apply(environment: Environment, eventListener: Event => Unit): Unit = {
-      environment.emitLine(s"event = $event")
     }
   }
 

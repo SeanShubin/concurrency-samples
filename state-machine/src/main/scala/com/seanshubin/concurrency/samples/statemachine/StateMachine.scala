@@ -10,19 +10,13 @@ class StateMachine(environment: Environment,
   private var state: State = State.Initial
 
   override def receiveSignal(ctx: ActorContext[Event], signal: Signal): StateMachine = {
-    applyEffect(Effect.ReceivedSignal(signal), ctx)
     this
   }
 
   override def receiveMessage(ctx: ActorContext[Event], event: Event): StateMachine = {
-    applyEffect(Effect.LogEvent(event), ctx)
     val (newState, effects) = eventApplier.applyEvent(state, event)
     state = newState
     effects.foreach(_.apply(environment, ctx.asScala.self.tell))
     this
-  }
-
-  private def applyEffect(effect: Effect, ctx: ActorContext[Event]): Unit = {
-    effect.apply(environment, ctx.asScala.self.tell)
   }
 }
