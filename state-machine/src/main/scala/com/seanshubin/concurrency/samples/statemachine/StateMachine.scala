@@ -16,8 +16,7 @@ class StateMachine(environment: Environment,
 
   override def receiveMessage(ctx: ActorContext[Event], event: Event): StateMachine = {
     applyEffect(Effect.LogEvent(event), ctx)
-    val StateAndEffects(newState, effects) = eventApplier.applyEvent(state, event)
-    applyEffect(Effect.LogStateTransition(state, newState), ctx)
+    val (newState, effects) = eventApplier.applyEvent(state, event)
     state = newState
     effects.foreach(_.apply(environment, ctx.asScala.self.tell))
     this

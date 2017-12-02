@@ -64,12 +64,6 @@ object Effect {
     }
   }
 
-  case class LogStateTransition(oldState: State, newState: State) extends Effect {
-    override def apply(environment: Environment, eventListener: Event => Unit): Unit = {
-      environment.emitLine(s"$oldState => $newState")
-    }
-  }
-
   case class GenerateReport(result: Int, startTime: Instant, finishTime: Instant) extends Effect {
     override def apply(environment: Environment, eventListener: Event => Unit): Unit = {
       val duration = Duration.between(startTime, finishTime).toMillis

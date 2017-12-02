@@ -22,19 +22,19 @@ finished computation
 */
 
 sealed trait State {
-  def readyToGetStarted(expectedQuantity: Int): StateAndEffects = {
+  def readyToGetStarted(expectedQuantity: Int): (State, Seq[Effect]) = {
     unsupported(s"start($expectedQuantity)")
   }
 
-  def numberAdded(value: Int): StateAndEffects = {
+  def numberAdded(value: Int): (State, Seq[Effect]) = {
     unsupported(s"addNumber($value)")
   }
 
-  def startTimeChecked(value: Instant): StateAndEffects = {
+  def startTimeChecked(value: Instant): (State, Seq[Effect]) = {
     unsupported(s"startTime($value)")
   }
 
-  def endTimeChecked(value: Instant): StateAndEffects = {
+  def endTimeChecked(value: Instant): (State, Seq[Effect]) = {
     unsupported(s"finishTime($value)")
   }
 
@@ -51,7 +51,7 @@ sealed trait State {
 object State {
 
   case object Initial extends State {
-    override def readyToGetStarted(expectedQuantity: Int): StateAndEffects = {
+    override def readyToGetStarted(expectedQuantity: Int): (State, Seq[Effect]) = {
       val newState = Processing(
         sum = 0,
         expectToProcess = expectedQuantity,
@@ -60,7 +60,7 @@ object State {
       val effects = Seq(
         Effect.GetStartedTime,
         Effect.CreateAddEvents(expectedQuantity))
-      StateAndEffects(newState, effects)
+      (newState, effects)
     }
   }
 
@@ -68,7 +68,7 @@ object State {
                         expectToProcess: Int,
                         processed: Int,
                         startTime: Option[Instant]) extends State {
-    override def numberAdded(value: Int): StateAndEffects = {
+    override def numberAdded(value: Int): (State, Seq[Effect]) = {
       val newProcessed = processed + 1
       val newValue = sum + value
       val stateAndEffects = if (newProcessed == expectToProcess && startTime.isDefined) {
@@ -76,23 +76,23 @@ object State {
           finalResult = sum,
           startTime = startTime.get)
         val effects = Seq(Effect.NotifyAdded(value), Effect.FinishedComputation, Effect.GetFinishedTime)
-        StateAndEffects(newState, effects)
+        (newState, effects)
       } else {
         val newState = copy(processed = newProcessed, sum = newValue)
         val effects = Seq(Effect.NotifyAdded(value))
-        StateAndEffects(newState, effects)
+        (newState, effects)
       }
       stateAndEffects
     }
 
-    override def startTimeChecked(value: Instant): StateAndEffects = {
-      StateAndEffects(copy(startTime = Some(value)), Seq())
+    override def startTimeChecked(value: Instant): (State, Seq[Effect]) = {
+      (copy(startTime = Some(value)), Seq())
     }
   }
 
   case class FinishedComputation(finalResult: Int, startTime: Instant) extends State {
-    override def endTimeChecked(value: Instant): StateAndEffects = {
-      StateAndEffects(Done, Seq(Effect.GenerateReport(finalResult, startTime, value), Effect.ResolveDonePromise))
+    override def endTimeChecked(value: Instant): (State, Seq[Effect]) = {
+      (Done, Seq(Effect.GenerateReport(finalResult, startTime, value), Effect.ResolveDonePromise))
     }
   }
 
