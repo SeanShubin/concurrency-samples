@@ -73,7 +73,7 @@ object State {
       val newValue = sum + value
       val stateAndEffects = if (newProcessed == expectToProcess && startTime.isDefined) {
         val newState = FinishedComputation(
-          finalResult = sum,
+          finalResult = newValue,
           startTime = startTime.get)
         val effects = Seq(Effect.NotifyAdded(value), Effect.FinishedComputation, Effect.GetFinishedTime)
         (newState, effects)
