@@ -38,12 +38,6 @@ object Effect {
     }
   }
 
-  case object FinishedComputation extends Effect {
-    override def apply(environment: Environment, eventListener: Event => Unit): Unit = {
-      environment.emitLine(s"finished computation")
-    }
-  }
-
   case object ResolveDonePromise extends Effect {
     override def apply(environment: Environment, eventListener: Event => Unit): Unit = {
       environment.setDone()

@@ -75,7 +75,7 @@ object State {
         val newState = FinishedComputation(
           finalResult = newValue,
           startTime = startTime.get)
-        val effects = Seq(Effect.NotifyAdded(value), Effect.FinishedComputation, Effect.GetFinishedTime)
+        val effects = Seq(Effect.NotifyAdded(value), Effect.GetFinishedTime)
         (newState, effects)
       } else {
         val newState = copy(processed = newProcessed, sum = newValue)
