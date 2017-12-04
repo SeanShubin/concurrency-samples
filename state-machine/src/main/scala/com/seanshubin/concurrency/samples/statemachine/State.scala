@@ -2,6 +2,8 @@ package com.seanshubin.concurrency.samples.statemachine
 
 import java.time.Instant
 
+import com.seanshubin.concurrency.samples.statemachine.Event.{AddNumber, GotFinishTime, GotStartTime, Start}
+
 /*
 state/event/effect
 
@@ -22,6 +24,15 @@ finished computation
 */
 
 sealed trait State {
+  def applyEvent(event: Event): (State, Seq[Effect]) = {
+    event match {
+      case Start(expectedQuantity) => readyToGetStarted(expectedQuantity)
+      case AddNumber(value) => numberAdded(value)
+      case GotStartTime(value) => startTimeChecked(value)
+      case GotFinishTime(value) => endTimeChecked(value)
+    }
+  }
+
   def readyToGetStarted(expectedQuantity: Int): (State, Seq[Effect]) = {
     unsupported(s"start($expectedQuantity)")
   }
