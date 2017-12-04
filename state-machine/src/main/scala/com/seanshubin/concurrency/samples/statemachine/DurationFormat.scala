@@ -5,21 +5,25 @@ import scala.util.matching.Regex
 
 object DurationFormat {
 
-  object MillisecondsFormat extends TimeUnitFormat(TimeUnitAndQuantity.MillisecondToDay)
+  object MillisecondsFormat extends TimeUnitFormat(TimeUnitAndQuantity.MillisecondToDay, shouldPad = false)
 
-  object NanosecondsFormat extends TimeUnitFormat(TimeUnitAndQuantity.NanosecondToDay)
+  object MillisecondsFormatPadded extends TimeUnitFormat(TimeUnitAndQuantity.MillisecondToDay, shouldPad = true)
+
+  object NanosecondsFormat extends TimeUnitFormat(TimeUnitAndQuantity.NanosecondToDay, shouldPad = false)
+
+  object NanosecondsFormatPadded extends TimeUnitFormat(TimeUnitAndQuantity.NanosecondToDay, shouldPad = true)
 
   private case class FormattedPartsAndRemainingValue(formattedParts: List[Option[String]], remainingValue: Long) {
     private def divMod(numerator: Long, denominator: Long): (Long, Long) = (numerator / denominator, numerator % denominator)
 
-    def applyTimeUnit(timeUnitAndQuantity: TimeUnitAndQuantity): FormattedPartsAndRemainingValue = {
+    def applyTimeUnit(timeUnitAndQuantity: TimeUnitAndQuantity, shouldPad: Boolean): FormattedPartsAndRemainingValue = {
       timeUnitAndQuantity match {
         case TimeUnitAndQuantity(timeUnit, Some(quantity)) =>
           val (newRemainingValue, partOfValueToFormat) = divMod(remainingValue, quantity)
-          val formattedPart = timeUnit.format(partOfValueToFormat)
+          val formattedPart = timeUnit.format(partOfValueToFormat, shouldPad)
           copy(formattedPart :: formattedParts, newRemainingValue)
         case TimeUnitAndQuantity(timeUnit, None) =>
-          val formattedPart = timeUnit.format(remainingValue)
+          val formattedPart = timeUnit.format(remainingValue, shouldPad)
           copy(formattedPart :: formattedParts, remainingValue)
       }
     }
@@ -41,30 +45,66 @@ object DurationFormat {
     }
   }
 
-  sealed abstract case class TimeUnit(singular: String, plural: String) {
+  sealed abstract case class TimeUnit(singular: String, plural: String, width: Int) {
     TimeUnit.valuesBuffer += this
+    val padPolicyMap: Map[Boolean, PadPolicy] = Map(true -> ShouldPad, false -> ShouldNotPad)
 
-    def format(value: Long): Option[String] =
+    def format(value: Long, shouldPad: Boolean): Option[String] = {
+      val padPolicy = padPolicyMap(shouldPad)
       if (value == 0) None
-      else if (value == 1) Some(s"$value $singular")
-      else Some(s"$value $plural")
+      else if (value == 1) Some(s"${padPolicy.padValue(value)} ${padPolicy.padSingular(singular)}")
+      else Some(s"${padPolicy.padValue(value)} $plural")
+    }
+
+    def padIfNecessary(value: Long, shouldPad: Boolean): String = {
+      if (shouldPad) {
+        rightJustify(value.toString)
+      } else {
+        value.toString
+      }
+    }
+
+    def rightJustify(value: String): String = {
+      val spacesNeeded = width - value.length
+      val spaces = " " * spacesNeeded
+      spaces + value
+    }
 
     def matchesString(target: String): Boolean = {
       singular.equalsIgnoreCase(target) || plural.equalsIgnoreCase(target)
     }
+
+    trait PadPolicy {
+      def padValue(value: Long): String
+
+      def padSingular(singular: String): String
+    }
+
+    object ShouldPad extends PadPolicy {
+      override def padValue(value: Long): String = rightJustify(value.toString)
+
+      override def padSingular(singular: String): String = singular + " "
+    }
+
+    object ShouldNotPad extends PadPolicy {
+      override def padValue(value: Long): String = value.toString
+
+      override def padSingular(singular: String): String = singular
+    }
+
   }
 
   private object TimeUnit {
     private val valuesBuffer = new ArrayBuffer[TimeUnit]
-    lazy val values = valuesBuffer.toSeq
+    lazy val values: Seq[TimeUnit] = valuesBuffer
 
-    val Nanosecond = new TimeUnit("nanosecond", "nanoseconds") {}
-    val Microsecond = new TimeUnit("microsecond", "microseconds") {}
-    val Millisecond = new TimeUnit("millisecond", "milliseconds") {}
-    val Second = new TimeUnit("second", "seconds") {}
-    val Minute = new TimeUnit("minute", "minutes") {}
-    val Hour = new TimeUnit("hour", "hours") {}
-    val Day = new TimeUnit("day", "days") {}
+    val Nanosecond = new TimeUnit("nanosecond", "nanoseconds", 3) {}
+    val Microsecond = new TimeUnit("microsecond", "microseconds", 3) {}
+    val Millisecond = new TimeUnit("millisecond", "milliseconds", 3) {}
+    val Second = new TimeUnit("second", "seconds", 2) {}
+    val Minute = new TimeUnit("minute", "minutes", 2) {}
+    val Hour = new TimeUnit("hour", "hours", 2) {}
+    val Day = new TimeUnit("day", "days", 0) {}
   }
 
   private case class TimeUnitAndQuantity(timeUnit: TimeUnit, maybeQuantity: Option[Int])
@@ -83,13 +123,13 @@ object DurationFormat {
         MillisecondToDay
   }
 
-  class TimeUnitFormat(scale: List[TimeUnitAndQuantity]) {
+  class TimeUnitFormat(scale: List[TimeUnitAndQuantity], shouldPad: Boolean) {
 
     import TimeUnitFormat._
 
     def format(smallestUnits: Long): String = {
       def accumulateFormat(soFar: FormattedPartsAndRemainingValue, timeUnitAndQuantity: TimeUnitAndQuantity): FormattedPartsAndRemainingValue = {
-        soFar.applyTimeUnit(timeUnitAndQuantity)
+        soFar.applyTimeUnit(timeUnitAndQuantity, shouldPad)
       }
 
       val initialValue = FormattedPartsAndRemainingValue(Nil, smallestUnits)
@@ -100,12 +140,13 @@ object DurationFormat {
     }
 
     def parse(asString: String): Long = {
-      if (asString.matches(NumberPattern)) {
-        parseSimpleNumber(asString)
-      } else if (asString.matches(OneOrMoreQuantifiedTimeUnitPattern)) {
-        parseStringWithUnits(asString)
+      val trimmed = asString.trim
+      if (trimmed.matches(NumberPattern)) {
+        parseSimpleNumber(trimmed)
+      } else if (trimmed.matches(OneOrMoreQuantifiedTimeUnitPattern)) {
+        parseStringWithUnits(trimmed)
       } else {
-        throw new RuntimeException(s"'$asString' does not match a valid pattern: $OneOrMoreQuantifiedTimeUnitPattern")
+        throw new RuntimeException(s"'$trimmed' does not match a valid pattern: $OneOrMoreQuantifiedTimeUnitPattern")
       }
     }
 
