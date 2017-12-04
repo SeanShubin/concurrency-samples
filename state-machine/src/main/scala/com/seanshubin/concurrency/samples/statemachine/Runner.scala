@@ -1,18 +1,15 @@
 package com.seanshubin.concurrency.samples.statemachine
 
-import akka.typed.ActorSystem
-
-import scala.concurrent.Future
 import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Awaitable}
 
-class Runner(await: AwaitContract,
-             actorSystem: ActorSystem[Event],
-             done: Future[Unit],
+class Runner(actorSystem: ActorSystemContract[Event],
+             done: Awaitable[Unit],
              duration: Duration) extends Runnable {
   override def run(): Unit = {
-    actorSystem ! Event.Start(10)
+    actorSystem.tell(Event.Start(10))
     try {
-      await.ready(done, duration)
+      Await.ready(done, duration)
     } finally {
       actorSystem.terminate()
     }

@@ -5,8 +5,8 @@ import java.util.concurrent.TimeUnit
 
 import akka.typed.{ActorSystem, Behavior}
 
+import scala.concurrent._
 import scala.concurrent.duration.Duration
-import scala.concurrent.{ExecutionContext, Future, Promise}
 
 trait DependencyInjection {
   implicit val executionContext: ExecutionContext = ExecutionContext.Implicits.global
@@ -19,12 +19,14 @@ trait DependencyInjection {
   val stateMachine: Behavior[Event] = new StateMachine(
     environment, eventApplier)
   val actorSystem: ActorSystem[Event] = ActorSystem(stateMachine, "stateMachineActor")
+  val actorSystemContract: ActorSystemContract[Event] = new ActorSystemDelegate[Event](actorSystem)
   val duration = Duration(5, TimeUnit.SECONDS)
   val done: Future[Unit] = donePromise.future
-  val await: AwaitContract = AwaitDelegate
+  val awaitReady: (Awaitable[Unit], Duration) => Unit = (a, d) => {
+    Await.ready(a, d)
+  }
   val runner: Runnable = new Runner(
-    await,
-    actorSystem,
+    actorSystemContract,
     done,
     duration
   )
