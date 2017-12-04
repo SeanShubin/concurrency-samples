@@ -10,8 +10,6 @@ object Event {
 
   case class AddNumber(value: Int) extends Event
 
-  case class Finished(result: Int)
-
   case class GotStartTime(value: Instant) extends Event
 
   case class GotFinishTime(value: Instant) extends Event

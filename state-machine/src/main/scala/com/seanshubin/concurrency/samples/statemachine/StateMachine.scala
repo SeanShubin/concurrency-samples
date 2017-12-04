@@ -1,11 +1,11 @@
 package com.seanshubin.concurrency.samples.statemachine
 
 import akka.typed.{ActorContext, ExtensibleBehavior, Signal}
+import com.seanshubin.concurrency.samples.statemachine.Event.{AddNumber, GotFinishTime, GotStartTime, Start}
 
 import scala.concurrent.ExecutionContext
 
-class StateMachine(environment: Environment,
-                   eventApplier: EventApplier)
+class StateMachine(environment: Environment)
                   (implicit executionContext: ExecutionContext) extends ExtensibleBehavior[Event] {
   private var state: State = State.Initial
 
@@ -14,7 +14,12 @@ class StateMachine(environment: Environment,
   }
 
   override def receiveMessage(ctx: ActorContext[Event], event: Event): StateMachine = {
-    val (newState, effects) = eventApplier.applyEvent(state, event)
+    val (newState, effects) = event match {
+      case Start(expectedQuantity) => state.readyToGetStarted(expectedQuantity)
+      case AddNumber(value) => state.numberAdded(value)
+      case GotStartTime(value) => state.startTimeChecked(value)
+      case GotFinishTime(value) => state.endTimeChecked(value)
+    }
     state = newState
     effects.foreach(_.apply(environment, ctx.asScala.self.tell))
     this

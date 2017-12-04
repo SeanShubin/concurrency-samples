@@ -15,9 +15,7 @@ trait DependencyInjection {
   val system: SystemContract = SystemDelegate
   val environment: Environment = new EnvironmentImpl(donePromise, clock, system)
   val emitLine: String => Unit = println
-  val eventApplier: EventApplier = new EventApplierImpl
-  val stateMachine: Behavior[Event] = new StateMachine(
-    environment, eventApplier)
+  val stateMachine: Behavior[Event] = new StateMachine(environment)
   val actorSystem: ActorSystem[Event] = ActorSystem(stateMachine, "stateMachineActor")
   val actorSystemContract: ActorSystemContract[Event] = new ActorSystemDelegate[Event](actorSystem)
   val duration = Duration(5, TimeUnit.SECONDS)
