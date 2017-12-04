@@ -12,7 +12,8 @@ trait DependencyInjection {
   implicit val executionContext: ExecutionContext = ExecutionContext.Implicits.global
   val clock: Clock = Clock.systemUTC()
   val donePromise: Promise[Unit] = Promise()
-  val environment: Environment = new EnvironmentImpl(donePromise, clock)
+  val system: SystemContract = SystemDelegate
+  val environment: Environment = new EnvironmentImpl(donePromise, clock, system)
   val emitLine: String => Unit = println
   val eventApplier: EventApplier = new EventApplierImpl
   val stateMachine: Behavior[Event] = new StateMachine(
