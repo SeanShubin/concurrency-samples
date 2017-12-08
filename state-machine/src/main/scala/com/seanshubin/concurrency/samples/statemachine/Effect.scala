@@ -24,7 +24,7 @@ object Effect {
 
   case class CreateAddEvents(expectedQuantity: Int) extends Effect {
     override def apply(environment: Environment, eventListener: Event => Unit): Unit = {
-      (1 to expectedQuantity).par.foreach(x => eventListener(Event.AddNumber(x)))
+      (1 to expectedQuantity).par.foreach(x => eventListener(Event.AddedNumber(x)))
     }
   }
 

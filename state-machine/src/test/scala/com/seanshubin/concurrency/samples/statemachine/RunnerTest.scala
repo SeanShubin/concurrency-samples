@@ -21,7 +21,7 @@ class RunnerTest extends FunSuite {
     runner.run()
 
     // then
-    assert(actorSystem.messages === Seq(Event.Start(10)))
+    assert(actorSystem.messages === Seq(Event.ReadyToStart(10)))
     assert(done.readyInvocations === Seq(duration))
     assert(actorSystem.terminateInvocationCount === 1)
   }

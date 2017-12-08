@@ -2,7 +2,7 @@ package com.seanshubin.concurrency.samples.statemachine
 
 import java.time.Instant
 
-import com.seanshubin.concurrency.samples.statemachine.Event.{AddNumber, GotFinishTime, GotStartTime, Start}
+import com.seanshubin.concurrency.samples.statemachine.Event.{AddedNumber, GotFinishTime, GotStartTime, ReadyToStart}
 
 /*
 state/event/effect
@@ -26,8 +26,8 @@ finished computation
 sealed trait State {
   def applyEvent(event: Event): (State, Seq[Effect]) = {
     event match {
-      case Start(expectedQuantity) => readyToGetStarted(expectedQuantity)
-      case AddNumber(value) => numberAdded(value)
+      case ReadyToStart(expectedQuantity) => readyToGetStarted(expectedQuantity)
+      case AddedNumber(value) => numberAdded(value)
       case GotStartTime(value) => startTimeChecked(value)
       case GotFinishTime(value) => endTimeChecked(value)
     }
@@ -103,10 +103,10 @@ object State {
 
   case class FinishedComputation(finalResult: Int, startTime: Instant) extends State {
     override def endTimeChecked(value: Instant): (State, Seq[Effect]) = {
-      (Done, Seq(Effect.GenerateReport(finalResult, startTime, value), Effect.ResolveDonePromise))
+      (ReadyToShutDown, Seq(Effect.GenerateReport(finalResult, startTime, value), Effect.ResolveDonePromise))
     }
   }
 
-  case object Done extends State
+  case object ReadyToShutDown extends State
 
 }

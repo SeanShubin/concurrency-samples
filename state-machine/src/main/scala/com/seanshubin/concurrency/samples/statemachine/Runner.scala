@@ -7,7 +7,7 @@ class Runner(actorSystem: ActorSystemContract[Event],
              done: Awaitable[Unit],
              duration: Duration) extends Runnable {
   override def run(): Unit = {
-    actorSystem.tell(Event.Start(10))
+    actorSystem.tell(Event.ReadyToStart(10))
     try {
       Await.ready(done, duration)
     } finally {
