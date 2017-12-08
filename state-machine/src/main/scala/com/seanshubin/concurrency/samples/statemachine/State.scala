@@ -84,7 +84,7 @@ object State {
       val newValue = sum + value
       val stateAndEffects = if (newProcessed == expectToProcess && startTime.isDefined) {
         val newState = FinishedComputation(
-          finalResult = newValue,
+          sum = newValue,
           startTime = startTime.get)
         val effects = Seq(Effect.NotifyAdded(value), Effect.GetFinishedTime)
         (newState, effects)
@@ -101,9 +101,9 @@ object State {
     }
   }
 
-  case class FinishedComputation(finalResult: Int, startTime: Instant) extends State {
+  case class FinishedComputation(sum: Int, startTime: Instant) extends State {
     override def endTimeChecked(value: Instant): (State, Seq[Effect]) = {
-      (ReadyToShutDown, Seq(Effect.GenerateReport(finalResult, startTime, value), Effect.ResolveDonePromise))
+      (ReadyToShutDown, Seq(Effect.GenerateReport(sum, startTime, value), Effect.ResolveDonePromise))
     }
   }
 
