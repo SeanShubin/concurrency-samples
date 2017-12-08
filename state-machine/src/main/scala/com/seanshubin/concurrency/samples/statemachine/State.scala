@@ -50,7 +50,7 @@ sealed trait State {
   }
 
   def unsupported(message: String): Nothing = {
-    throw new RuntimeException(s"unsupported from state $name: $message")
+    throw new RuntimeException(s"unsupported transition: $name -> $message")
   }
 
   def name: String = {
