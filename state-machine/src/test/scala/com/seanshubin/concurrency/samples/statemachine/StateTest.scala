@@ -1,10 +1,10 @@
 package com.seanshubin.concurrency.samples.statemachine
 
-import java.time.Instant
+import java.time.{Clock, Instant}
 
-import com.seanshubin.concurrency.samples.statemachine.Effect.{CreateAddEvents, GetFinishedTime, GetStartedTime, NotifyAdded}
+import com.seanshubin.concurrency.samples.statemachine.Effect._
 import com.seanshubin.concurrency.samples.statemachine.Event.{AddedNumber, GotFinishTime, GotStartTime, ReadyToStart}
-import com.seanshubin.concurrency.samples.statemachine.State.{FinishedComputation, Initial, Processing}
+import com.seanshubin.concurrency.samples.statemachine.State.{FinishedComputation, Initial, Processing, ReadyToShutDown}
 import org.scalatest.FunSuite
 
 class StateTest extends FunSuite {
@@ -22,11 +22,12 @@ class StateTest extends FunSuite {
   }
 
   test("unsupported transitions from initial") {
+    val state = Initial
     val startTime = Instant.parse("2017-12-08T18:46:10.276Z")
     val finishTime = Instant.parse("2017-12-08T18:46:24.071Z")
-    assertUnsupportedTransition(Initial, AddedNumber(234), "unsupported transition: Initial -> addNumber(234)")
-    assertUnsupportedTransition(Initial, GotStartTime(startTime), "unsupported transition: Initial -> startTime(2017-12-08T18:46:10.276Z)")
-    assertUnsupportedTransition(Initial, GotFinishTime(finishTime), "unsupported transition: Initial -> finishTime(2017-12-08T18:46:24.071Z)")
+    assertUnsupportedTransition(state, AddedNumber(234), "unsupported transition: Initial -> addNumber(234)")
+    assertUnsupportedTransition(state, GotStartTime(startTime), "unsupported transition: Initial -> startTime(2017-12-08T18:46:10.276Z)")
+    assertUnsupportedTransition(state, GotFinishTime(finishTime), "unsupported transition: Initial -> finishTime(2017-12-08T18:46:24.071Z)")
   }
 
   test("processing -> number added") {
@@ -80,6 +81,30 @@ class StateTest extends FunSuite {
     assert(effects === Seq(NotifyAdded(6), GetFinishedTime))
   }
 
+  test("finished computation -> end time checked") {
+    // given
+    val startTime = Instant.parse("2017-12-08T23:42:28.834Z")
+    val finishTime = Instant.parse("2017-12-08T23:42:56.790Z")
+    val state = FinishedComputation(sum = 20, startTime = startTime)
+
+    // when
+    val (newState, effects) = state.applyEvent(GotFinishTime(finishTime))
+
+    // then
+    assert(newState === ReadyToShutDown)
+    assert(effects === Seq(GenerateReport(20, startTime, finishTime), ResolveDonePromise))
+  }
+
+  test("no supported transitions from ReadyToShutDown") {
+    println(Clock.systemUTC().instant())
+    val state = ReadyToShutDown
+    val startTime = Instant.parse("2017-12-08T23:47:05.810Z")
+    val finishTime = Instant.parse("2017-12-08T23:47:15.249Z")
+    assertUnsupportedTransition(state, ReadyToStart(20), "unsupported transition: ReadyToShutDown -> start(20)")
+    assertUnsupportedTransition(state, AddedNumber(200), "unsupported transition: ReadyToShutDown -> addNumber(200)")
+    assertUnsupportedTransition(state, GotStartTime(startTime), "unsupported transition: ReadyToShutDown -> startTime(2017-12-08T23:47:05.810Z)")
+    assertUnsupportedTransition(state, GotFinishTime(finishTime), "unsupported transition: ReadyToShutDown -> finishTime(2017-12-08T23:47:15.249Z)")
+  }
 
   def assertUnsupportedTransition(state: State, event: Event, expectedMessage: String): Unit = {
     val exception = intercept[RuntimeException] {
