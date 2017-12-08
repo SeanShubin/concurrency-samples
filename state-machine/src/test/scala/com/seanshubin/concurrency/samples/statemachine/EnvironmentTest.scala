@@ -9,11 +9,6 @@ import org.scalatest.FunSuite
 import scala.concurrent.Promise
 
 class EnvironmentTest extends FunSuite {
-  /*
-    override def setDone(): Unit = done.success(())
-
-    override def currentTime(): Instant = clock.instant()
-   */
   val charset: Charset = StandardCharsets.UTF_8
   val dummyPromise: Promise[Unit] = null
   val dummyClock: Clock = null
