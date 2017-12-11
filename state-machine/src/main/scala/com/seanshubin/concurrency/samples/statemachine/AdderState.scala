@@ -23,7 +23,7 @@ finished computation
         generate report
 */
 
-sealed trait AdderState extends State[Event] {
+sealed trait AdderState extends State[Event, Environment] {
   override def apply(event: Event): (AdderState, Seq[AdderEffect]) = {
     event match {
       case ReadyToStart(expectedQuantity) => readyToGetStarted(expectedQuantity)

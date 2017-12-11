@@ -1,7 +1,7 @@
 package com.seanshubin.concurrency.samples.statemachine
 
-trait State[EventType] {
-  def apply(event: EventType): (State[EventType], Seq[Effect[EventType]])
+trait State[EventType, EnvironmentType] {
+  def apply(event: EventType): (State[EventType, EnvironmentType], Seq[Effect[EventType, EnvironmentType]])
 
   def unsupported(message: String): Nothing = {
     throw new RuntimeException(s"unsupported transition: $name -> $message")
