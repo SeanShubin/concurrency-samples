@@ -2,12 +2,12 @@ package com.seanshubin.concurrency.samples.statemachine
 
 import java.time.{Clock, Instant}
 
-import com.seanshubin.concurrency.samples.statemachine.Effect._
+import com.seanshubin.concurrency.samples.statemachine.AdderEffect._
+import com.seanshubin.concurrency.samples.statemachine.AdderState.{FinishedComputation, Initial, Processing, ReadyToShutDown}
 import com.seanshubin.concurrency.samples.statemachine.Event.{AddedNumber, GotFinishTime, GotStartTime, ReadyToStart}
-import com.seanshubin.concurrency.samples.statemachine.State.{FinishedComputation, Initial, Processing, ReadyToShutDown}
 import org.scalatest.FunSuite
 
-class StateTest extends FunSuite {
+class AdderStateTest extends FunSuite {
   test("initial -> ready to get started -> get started time and create add events") {
     // given
     val state = Initial
@@ -106,7 +106,7 @@ class StateTest extends FunSuite {
     assertUnsupportedTransition(state, GotFinishTime(finishTime), "unsupported transition: ReadyToShutDown -> finishTime(2017-12-08T23:47:15.249Z)")
   }
 
-  def assertUnsupportedTransition(state: State, event: Event, expectedMessage: String): Unit = {
+  def assertUnsupportedTransition(state: AdderState, event: Event, expectedMessage: String): Unit = {
     val exception = intercept[RuntimeException] {
       state.apply(event)
     }

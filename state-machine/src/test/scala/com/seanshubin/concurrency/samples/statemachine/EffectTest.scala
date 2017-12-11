@@ -2,7 +2,7 @@ package com.seanshubin.concurrency.samples.statemachine
 
 import java.time.Instant
 
-import com.seanshubin.concurrency.samples.statemachine.Effect.{GetFinishedTime, GetStartedTime}
+import com.seanshubin.concurrency.samples.statemachine.AdderEffect.{GetFinishedTime, GetStartedTime}
 import com.seanshubin.concurrency.samples.statemachine.Event.{GotFinishTime, GotStartTime}
 import org.scalatest.FunSuite
 

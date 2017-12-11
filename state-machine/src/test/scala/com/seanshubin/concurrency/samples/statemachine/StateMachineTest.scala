@@ -19,7 +19,7 @@ class StateMachineTest extends FunSuite {
     implicit val executionContext: ExecutionContext = ExecutionContext.Implicits.global
     val currentTimeResult = Instant.parse("2017-12-09T00:05:12.458Z")
     val environment = new EnvironmentStub(currentTimeResult)
-    val stateMachine: ExtensibleBehavior[Event] = new StateMachine(environment, State.Initial)
+    val stateMachine: ExtensibleBehavior[Event] = new StateMachine(environment, AdderState.Initial)
     val actorSystem: ActorSystem[Event] = ActorSystem(stateMachine, "stateMachineActor")
     val actorContext = new StubbedActorContext[Event]("actor-context-stub", mailboxCapacity = 10, actorSystem)
 
