@@ -1,6 +1,6 @@
 package com.seanshubin.concurrency.samples.statemachine
 
-import java.time.{Clock, Instant}
+import java.time.Instant
 
 import com.seanshubin.concurrency.samples.statemachine.AdderEffect._
 import com.seanshubin.concurrency.samples.statemachine.AdderState.{FinishedComputation, Initial, Processing, ReadyToShutDown}
@@ -96,7 +96,6 @@ class AdderStateTest extends FunSuite {
   }
 
   test("no supported transitions from ReadyToShutDown") {
-    println(Clock.systemUTC().instant())
     val state = ReadyToShutDown
     val startTime = Instant.parse("2017-12-08T23:47:05.810Z")
     val finishTime = Instant.parse("2017-12-08T23:47:15.249Z")
