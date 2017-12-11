@@ -2,7 +2,7 @@ package com.seanshubin.concurrency.samples.statemachine
 
 import java.time.{Duration, Instant}
 
-sealed trait AdderEffect extends Effect[Event] {
+sealed trait AdderEffect extends Effect[Event, Environment] {
   def apply(environment: Environment, eventListener: Event => Unit): Unit
 }
 
