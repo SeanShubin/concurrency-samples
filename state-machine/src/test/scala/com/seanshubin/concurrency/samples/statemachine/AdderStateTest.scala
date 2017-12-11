@@ -3,7 +3,7 @@ package com.seanshubin.concurrency.samples.statemachine
 import java.time.Instant
 
 import com.seanshubin.concurrency.samples.statemachine.AdderEffect._
-import com.seanshubin.concurrency.samples.statemachine.AdderState.{FinishedComputation, Initial, Processing, ReadyToShutDown}
+import com.seanshubin.concurrency.samples.statemachine.AdderState.{Done, FinishedComputation, Initial, Processing}
 import com.seanshubin.concurrency.samples.statemachine.Event.{AddedNumber, GotFinishTime, GotStartTime, ReadyToStart}
 import org.scalatest.FunSuite
 
@@ -91,18 +91,18 @@ class AdderStateTest extends FunSuite {
     val (newState, effects) = state.apply(GotFinishTime(finishTime))
 
     // then
-    assert(newState === ReadyToShutDown)
+    assert(newState === Done)
     assert(effects === Seq(GenerateReport(20, startTime, finishTime), ResolveDonePromise))
   }
 
-  test("no supported transitions from ReadyToShutDown") {
-    val state = ReadyToShutDown
+  test("no supported transitions from Done") {
+    val state = Done
     val startTime = Instant.parse("2017-12-08T23:47:05.810Z")
     val finishTime = Instant.parse("2017-12-08T23:47:15.249Z")
-    assertUnsupportedTransition(state, ReadyToStart(20), "unsupported transition: ReadyToShutDown -> start(20)")
-    assertUnsupportedTransition(state, AddedNumber(200), "unsupported transition: ReadyToShutDown -> addNumber(200)")
-    assertUnsupportedTransition(state, GotStartTime(startTime), "unsupported transition: ReadyToShutDown -> startTime(2017-12-08T23:47:05.810Z)")
-    assertUnsupportedTransition(state, GotFinishTime(finishTime), "unsupported transition: ReadyToShutDown -> finishTime(2017-12-08T23:47:15.249Z)")
+    assertUnsupportedTransition(state, ReadyToStart(20), "unsupported transition: Done -> start(20)")
+    assertUnsupportedTransition(state, AddedNumber(200), "unsupported transition: Done -> addNumber(200)")
+    assertUnsupportedTransition(state, GotStartTime(startTime), "unsupported transition: Done -> startTime(2017-12-08T23:47:05.810Z)")
+    assertUnsupportedTransition(state, GotFinishTime(finishTime), "unsupported transition: Done -> finishTime(2017-12-08T23:47:15.249Z)")
   }
 
   def assertUnsupportedTransition(state: AdderState, event: Event, expectedMessage: String): Unit = {

@@ -4,23 +4,12 @@ import java.time.Instant
 
 import com.seanshubin.concurrency.samples.statemachine.Event.{AddedNumber, GotFinishTime, GotStartTime, ReadyToStart}
 
-/*
-state/event/effect
-
-initial
-    ready to get started
-        get start time
-        create add events
-        create start time event
-processing
-    number added
-        create finished computation event
-        get end time
-        create end time event
-    start time checked
-finished computation
-    end time checked
-        generate report
+/* Adder State Machine Summary
+state               event         possible-effects                    possible-new-states
+Initial             ReadyToStart  [GetStartedTime CreateAddEvents]    [Processing]
+Processing          AddedNumber   [NotifyAdded GetFinishedTime]       [Processing FinishedComputation]
+Processing          GotStartTime  []                                  [Processing FinishedComputation]
+FinishedComputation GotFinishTime [GenerateReport ResolveDonePromise] [Done]
 */
 
 sealed trait AdderState extends State[Event, Environment] {
@@ -89,16 +78,25 @@ object AdderState {
     }
 
     override def startTimeChecked(value: Instant): (AdderState, Seq[AdderEffect]) = {
-      (copy(startTime = Some(value)), Seq())
+      val effects = Seq()
+      val stateAndEffects = if (processed == expectToProcess) {
+        val newState = FinishedComputation(
+          sum,
+          startTime = value)
+        (newState, effects)
+      } else {
+        (this.copy(startTime = Some(value)), effects)
+      }
+      stateAndEffects
     }
   }
 
   case class FinishedComputation(sum: Int, startTime: Instant) extends AdderState {
     override def endTimeChecked(value: Instant): (AdderState, Seq[AdderEffect]) = {
-      (ReadyToShutDown, Seq(AdderEffect.GenerateReport(sum, startTime, value), AdderEffect.ResolveDonePromise))
+      (Done, Seq(AdderEffect.GenerateReport(sum, startTime, value), AdderEffect.ResolveDonePromise))
     }
   }
 
-  case object ReadyToShutDown extends AdderState
+  case object Done extends AdderState
 
 }
