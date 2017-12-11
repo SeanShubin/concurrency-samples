@@ -14,7 +14,7 @@ class StateTest extends FunSuite {
     val expectedQuantity = 123
 
     // when
-    val (newState, effects) = state.applyEvent(ReadyToStart(expectedQuantity))
+    val (newState, effects) = state.apply(ReadyToStart(expectedQuantity))
 
     // then
     assert(newState === Processing(sum = 0, expectToProcess = 123, processed = 0, startTime = None))
@@ -40,7 +40,7 @@ class StateTest extends FunSuite {
     val state = Processing(sum, expectToProcess, processed, maybeStartTime)
 
     // when
-    val (newState, effects) = state.applyEvent(AddedNumber(4))
+    val (newState, effects) = state.apply(AddedNumber(4))
 
     // then
     assert(newState === Processing(sum = 5, expectToProcess = 10, processed = 4, startTime = Some(startTime)))
@@ -57,7 +57,7 @@ class StateTest extends FunSuite {
     val state = Processing(sum, expectToProcess, processed, maybeStartTime)
 
     // when
-    val (newState, effects) = state.applyEvent(GotStartTime(startTime))
+    val (newState, effects) = state.apply(GotStartTime(startTime))
 
     // then
     assert(newState === Processing(sum = 3, expectToProcess = 30, processed = 5, startTime = Some(startTime)))
@@ -74,7 +74,7 @@ class StateTest extends FunSuite {
     val state = Processing(sum, expectToProcess, processed, maybeStartTime)
 
     // when
-    val (newState, effects) = state.applyEvent(AddedNumber(6))
+    val (newState, effects) = state.apply(AddedNumber(6))
 
     // then
     assert(newState === FinishedComputation(sum = 9, startTime = startTime))
@@ -88,7 +88,7 @@ class StateTest extends FunSuite {
     val state = FinishedComputation(sum = 20, startTime = startTime)
 
     // when
-    val (newState, effects) = state.applyEvent(GotFinishTime(finishTime))
+    val (newState, effects) = state.apply(GotFinishTime(finishTime))
 
     // then
     assert(newState === ReadyToShutDown)
@@ -108,7 +108,7 @@ class StateTest extends FunSuite {
 
   def assertUnsupportedTransition(state: State, event: Event, expectedMessage: String): Unit = {
     val exception = intercept[RuntimeException] {
-      state.applyEvent(event)
+      state.apply(event)
     }
     assert(exception.getMessage === expectedMessage)
 

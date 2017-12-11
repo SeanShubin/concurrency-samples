@@ -24,7 +24,7 @@ finished computation
 */
 
 sealed trait State {
-  def applyEvent(event: Event): (State, Seq[Effect]) = {
+  def apply(event: Event): (State, Seq[Effect]) = {
     event match {
       case ReadyToStart(expectedQuantity) => readyToGetStarted(expectedQuantity)
       case AddedNumber(value) => numberAdded(value)

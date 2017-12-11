@@ -13,7 +13,7 @@ class StateMachine(environment: Environment, initialState: State)
   }
 
   override def receiveMessage(ctx: ActorContext[Event], event: Event): StateMachine = {
-    val (newState, effects) = state.applyEvent(event)
+    val (newState, effects) = state.apply(event)
     state = newState
     effects.foreach(_.apply(environment, ctx.asScala.self.tell))
     this
