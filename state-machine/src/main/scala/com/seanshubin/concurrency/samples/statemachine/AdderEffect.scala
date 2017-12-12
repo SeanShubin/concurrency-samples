@@ -23,7 +23,7 @@ object AdderEffect {
 
   case class CreateAddEvents(expectedQuantity: Int) extends AdderEffect {
     override def apply(environment: Environment, eventListener: Event => Unit): Unit = {
-      (1 to expectedQuantity).par.foreach(x => eventListener(Event.AddedNumber(x)))
+      (1 to expectedQuantity).foreach(x => eventListener(Event.AddedNumber(x)))
     }
   }
 
