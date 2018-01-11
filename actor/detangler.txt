@@ -1,15 +1,33 @@
 {
-  reportDir actor/target/detangler/
-  searchPaths [
-    actor/target/concurrency-samples-actor.jar
+  reportDir actor/target/detangled
+  searchPaths
+  [
+    ./actor/target/concurrency-samples.jar
   ]
-  level 1
-  startsWith {
-    include [[com seanshubin concurrency samples]]
-    drop [[com seanshubin concurrency samples]]
+  level 2
+  startsWith
+  {
+    include
+    [
+      [
+        com
+        seanshubin
+        concurrency
+        samples
+      ]
+    ]
     exclude []
+    drop
+    [
+      [
+        com
+        seanshubin
+        concurrency
+        samples
+      ]
+    ]
   }
-  allowedInCycle [
-  ]
+  ignoreFiles []
   canFailBuild true
+  allowedInCycle actor/detangler-allowed-in-cycle.txt
 }

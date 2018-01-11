@@ -1,15 +1,33 @@
 {
-  reportDir locking/target/detangler/
-  searchPaths [
-    locking/target/concurrency-samples-locking.jar
+  reportDir locking/target/detangled
+  searchPaths
+  [
+    ./locking/target/concurrency-samples.jar
   ]
-  level 1
-  startsWith {
-    include [[com seanshubin concurrency samples]]
-    drop [[com seanshubin concurrency samples]]
+  level 2
+  startsWith
+  {
+    include
+    [
+      [
+        com
+        seanshubin
+        concurrency
+        samples
+      ]
+    ]
     exclude []
+    drop
+    [
+      [
+        com
+        seanshubin
+        concurrency
+        samples
+      ]
+    ]
   }
-  allowedInCycle [
-  ]
+  ignoreFiles []
   canFailBuild true
+  allowedInCycle locking/detangler-allowed-in-cycle.txt
 }

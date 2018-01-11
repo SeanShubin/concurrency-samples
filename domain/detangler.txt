@@ -1,8 +1,8 @@
 {
-  reportDir actor-builtin/target/detangled
+  reportDir domain/target/detangled
   searchPaths
   [
-    ./actor-builtin/target/concurrency-samples.jar
+    ./domain/target/concurrency-samples-domain-0.1-SNAPSHOT.jar
   ]
   level 2
   startsWith
@@ -29,5 +29,5 @@
   }
   ignoreFiles []
   canFailBuild true
-  allowedInCycle actor-builtin/detangler-allowed-in-cycle.txt
+  allowedInCycle domain/detangler-allowed-in-cycle.txt
 }

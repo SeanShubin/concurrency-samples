@@ -1,0 +1,51 @@
+{
+  prefix [com seanshubin]
+  name [concurrency samples]
+  description 'Sample projects demonstrating different concurrency models'
+  version 0.1-SNAPSHOT
+  developer {
+    name 'Sean Shubin'
+    githubName SeanShubin
+    mavenUserName SeanShubin
+    organization 'Sean Shubin'
+    url http://seanshubin.com/
+  }
+  dependencies {
+    scala-library {
+      group org.scala-lang
+      artifact scala-library
+    }
+    scala-test {
+      group org.scalatest
+      artifact scalatest_2.12
+      scope test
+    }
+    akka {
+        group com.typesafe.akka
+        artifact akka-typed_2.12
+    }
+    akka-testkit {
+        group com.typesafe.akka
+        artifact akka-typed-testkit_2.12
+        scope test
+    }
+  }
+  modules {
+    actor            [domain akka]
+    actor-builtin    [domain akka akka-testkit]
+    atomicreference  [domain ]
+    domain           []
+    locking          [domain]
+    notthreadsafe    [domain]
+    statemachine     [akka]
+  }
+  detangler [domain actor actor-builtin atomicreference locking notthreadsafe statemachine]
+  consoleEntryPoint {
+    actor            com.seanshubin.concurrency.samples.actor.TypedActorSampleApp
+    actor-builtin    com.seanshubin.concurrency.samples.actor.builtin.TypedActorSampleApp
+    atomicreference  com.seanshubin.concurrency.samples.atomicreference.AtomicReferenceSampleApp
+    locking          com.seanshubin.concurrency.samples.locking.LockingSampleApp
+    notthreadsafe    com.seanshubin.concurrency.samples.notthreadsafe.NotThreadSafeSampleApp
+    statemachine     com.seanshubin.concurrency.samples.statemachine.StateMachineSampleApp
+  }
+}
