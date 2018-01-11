@@ -30,6 +30,7 @@
         scope test
     }
   }
+  global [scala-library scala-test]
   modules {
     actor            [domain akka]
     actor-builtin    [domain akka akka-testkit]
