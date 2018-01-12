@@ -34,11 +34,11 @@
   modules {
     actor            [domain akka]
     actor-builtin    [domain akka akka-testkit]
-    atomicreference  [domain ]
+    atomicreference  [domain]
     domain           []
     locking          [domain]
     notthreadsafe    [domain]
-    statemachine     [akka]
+    statemachine     [akka akka-testkit]
   }
   detangler [domain actor actor-builtin atomicreference locking notthreadsafe statemachine]
   consoleEntryPoint {
